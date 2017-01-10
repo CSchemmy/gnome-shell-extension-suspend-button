@@ -14,6 +14,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
    Author: Raphael Freudiger <laser_b@gmx.ch>
+   Extensions by: Christoph Schemmelmann <CSchemmy@gmx.de>
 **/
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
