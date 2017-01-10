@@ -3,6 +3,7 @@
 # Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Raphael Freudiger <laser_b@gmx.ch>, 2014.
+# Extensions by: Christoph Schemmelmann <CSchemmy@gmx.de>, 2016
 #
 msgid ""
 msgstr ""
@@ -19,19 +20,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: prefs.js:28
+#: prefs.js:30
 msgid "Two buttons"
 msgstr "Zwei Knöpfe"
 
-#: prefs.js:28
+#: prefs.js:30
 msgid "Show two distinct buttons instead of alt-switch-button."
 msgstr "Zwei Knöpfe anstelle eines einzelnen anzeigen."
 
-#: prefs.js:29
+#: prefs.js:31
 msgid "Suspend default"
 msgstr "Standard: Bereitschaft"
 
-#: prefs.js:29
+#: prefs.js:31
 msgid ""
 "Change alt-switch-buttons behaviour to default to suspend.\n"
 "Press alt to shutdown.\n"
@@ -41,10 +42,23 @@ msgstr ""
 "Zum Herunterfahren ALT gedrückt halten.\n"
 "Diese Einstellung hat keinen Effekt, wenn zwei Knöpfe angezeigt werden."
 
-#: extension.js:116
+#: prefs.js:32
+msgid "Replace poweroff"
+msgstr "Ersetze Ausschaltknopf "
+
+#: prefs.js:32
+msgid "Replace shutdown by logoff."
+msgstr "Ersetze Ausschaltknopf durch Abmeldeknopf"
+
+
+#: extension.js:92
 msgid "Suspend"
 msgstr "Bereitschaft"
 
-#: extension.js:119
+#: extension.js:96
 msgid "Power Off"
 msgstr "Herunterfahren"
+
+#: extension.js:100
+msgid "Log Off"
+msgstr "Abmelden"

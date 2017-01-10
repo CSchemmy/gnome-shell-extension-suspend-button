@@ -18,19 +18,19 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: prefs.js:29
+#: prefs.js:30
 msgid "Two buttons"
 msgstr "双按钮"
 
-#: prefs.js:29
+#: prefs.js:30
 msgid "Show two distinct buttons instead of alt-switch-button."
 msgstr "两个按钮都显示，而非用 Alt 键切换。"
 
-#: prefs.js:30
+#: prefs.js:31
 msgid "Suspend default"
 msgstr "默认挂起"
 
-#: prefs.js:30
+#: prefs.js:31
 msgid ""
 "Change alt-switch-buttons behaviour to default to suspend.\n"
 "Press alt to shutdown.\n"
@@ -40,10 +40,22 @@ msgstr ""
 "按下 Alt 键切换为关机。\n"
 "如果设置了两个按钮都显示，那么这条设置无效。"
 
-#: extension.js:132
+#: prefs.js:32
+msgid "Replace poweroff"
+msgstr "Replace poweroff"
+
+#: prefs.js:32
+msgid "Replace shutdown by logoff."
+msgstr "Replace shutdown by logoff."
+
+#: extension.js:92
 msgid "Suspend"
 msgstr "挂起"
 
-#: extension.js:135
+#: extension.js:96
 msgid "Power Off"
 msgstr "关机"
+
+#: extension.js:100
+msgid "Log Off"
+msgstr "Log Off"

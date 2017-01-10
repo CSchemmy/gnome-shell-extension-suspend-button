@@ -3,6 +3,7 @@
 # Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Raphael Freudiger <laser_b@gmx.ch>, 2014.
+# Extensions by: Christoph Schemmelmann <CSchemmy@gmx.de>, 2016
 #
 msgid ""
 msgstr ""
@@ -19,19 +20,19 @@ msgstr ""
 "X-Generator: Poedit 1.8.1\n"
 "Language: pl_PL\n"
 
-#: prefs.js:28
+#: prefs.js:30
 msgid "Two buttons"
 msgstr "Dwa przyciski"
 
-#: prefs.js:28
+#: prefs.js:30
 msgid "Show two distinct buttons instead of alt-switch-button."
 msgstr "Pokaż dwa osobne przyciski zamiast jednego zmienianego przez Alt"
 
-#: prefs.js:29
+#: prefs.js:31
 msgid "Suspend default"
 msgstr "Domyślnie wstrzymaj"
 
-#: prefs.js:29
+#: prefs.js:31
 msgid ""
 "Change alt-switch-buttons behaviour to default to suspend.\n"
 "Press alt to shutdown.\n"
@@ -41,10 +42,22 @@ msgstr ""
 "Naciśnij Alt, żeby zamknąć.\n"
 "Nic nie zmienia, gdy obydwa przyciski są pokazywane."
 
-#: extension.js:116
+#: prefs.js:32
+msgid "Replace poweroff"
+msgstr "Replace poweroff"
+
+#: prefs.js:32
+msgid "Replace shutdown by logoff."
+msgstr "Replace shutdown by logoff."
+
+#: extension.js:92
 msgid "Suspend"
 msgstr "Wstrzymaj"
 
-#: extension.js:119
+#: extension.js:96
 msgid "Power Off"
 msgstr "Wyłącz"
+
+#: extension.js:100
+msgid "Log Off"
+msgstr "Log Off"

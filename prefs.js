@@ -15,6 +15,7 @@ const Lib = Me.imports.lib;
 
 const SHOW_TWO_BUTTONS = 'show-two-buttons';
 const SUSPEND_DEFAULT = 'suspend-default';
+const REPLACE_POWEROFF = 'replace-poweroff';
 
 let _settings;
 
@@ -28,6 +29,7 @@ function buildPrefsWidget() {
         border_width: 10, margin: 20});
     frame.add(_createCheckBox(SHOW_TWO_BUTTONS, _("Two buttons"), _("Show two distinct buttons instead of alt-switch-button.")));
     frame.add(_createCheckBox(SUSPEND_DEFAULT, _("Suspend default"), _("Change alt-switch-buttons behaviour to default to suspend.\nPress alt to shutdown.\nThis setting has no effect if two buttons are shown.")));
+    frame.add(_createCheckBox(REPLACE_POWEROFF, _("Replace poweroff"), _("Replace shutdown by logoff.")));
     
     frame.show_all();
     return frame;
@@ -45,4 +47,3 @@ function _createCheckBox(key, text, tooltip) {
     box.add(widget);
     return box;
 }
-

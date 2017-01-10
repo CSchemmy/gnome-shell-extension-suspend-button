@@ -1,4 +1,4 @@
-﻿/*  Copyright (C) 2014 Raphael Freudiger <laser_b@gmx.ch>
+﻿﻿/*  Copyright (C) 2014 Raphael Freudiger <laser_b@gmx.ch>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ const ExtensionSystem = imports.ui.extensionSystem;
 
 const SHOW_TWO_BUTTONS = 'show-two-buttons';
 const SUSPEND_DEFAULT = 'suspend-default';
+const REPLACE_POWEROFF = 'replace-poweroff';
 
 const Gettext = imports.gettext.domain('gnome-shell-extension-suspend-button');
 const _ = Gettext.gettext;
@@ -45,96 +46,60 @@ const Extension = new Lang.Class({
 
         this._settings = Lib.getSettings(Me);
         this._toggleTwoButtonsID = this._settings.connect("changed::" + SHOW_TWO_BUTTONS, Lang.bind(this, function() {
-            this._toggleTwoButtons();
+            this._update();
         }));
         this._toggleSuspendDefaultID = this._settings.connect("changed::" + SUSPEND_DEFAULT, Lang.bind(this, function() {
-            this._toggleSuspendDefault();
+            this._update();
+        }));
+        this._toggleReplacePoweroffID = this._settings.connect("changed::" + REPLACE_POWEROFF, Lang.bind(this, function() {
+            this._update();
         }));
         
-        if (this._settings.get_boolean(SHOW_TWO_BUTTONS)) {
-            this._createActions();
-            this._removealtSwitcher();
-            this._addSingleButtons();
-        }
-        else {
-            if (this._settings.get_boolean(SUSPEND_DEFAULT)) {
-                this._createActions();
-                this._removealtSwitcher();
-                this._createaltStatusSwitcher();
-            }
-        }
+        this._removealtSwitcher();
+        this._setActState();
+        this._updateObjects();
 
         this._menuOpenStateChangedId = this.systemMenu.menu.connect('open-state-changed', Lang.bind(this,
             function(menu, open) {
                 if (!open)
                     return;
                 this._altsuspendAction.visible = true;
-                this._altpowerOffAction.visible = true;
+                this._altpowerOff_logOffAction.visible = true;
             }));
     },
 
     disable: function() {
         this._settings.disconnect(this._toggleTwoButtonsID);
         this._settings.disconnect(this._toggleSuspendDefaultID);
+	this._settings.disconnect(this._toggleReplacePoweroffID);
         
         if (this._menuOpenStateChangedId) {
             this.systemMenu.menu.disconnect(this._menuOpenStateChangedId);
             this._menuOpenStateChangedId = 0;
         }
 
-           this._destroyActions();
-        if (this._settings.get_boolean(SUSPEND_DEFAULT)) {
-              this._removealtStatusSwitcher();   
-        }
+        this._removeObjects();
         this._addDefaultButton();
     },
     
-    _toggleTwoButtons: function() {
-        if (this._settings.get_boolean(SHOW_TWO_BUTTONS)) {
-            if (this._settings.get_boolean(SUSPEND_DEFAULT)) {
-                this._removealtStatusSwitcher();
-                this._destroyActions();
-            }
-            else {
-                this._removealtSwitcher();
-            }
-            this._createActions();
-            this._addSingleButtons();
-        }
-        else {
-            this._destroyActions();
-            if (this._settings.get_boolean(SUSPEND_DEFAULT)) {
-                this._createActions();
-                this._createaltStatusSwitcher();
-            }
-            else {
-                this._addDefaultButton();
-            }
-        }
-    },
-    
-    _toggleSuspendDefault: function() {
-        if (!this._settings.get_boolean(SHOW_TWO_BUTTONS)) {
-            if (this._settings.get_boolean(SUSPEND_DEFAULT)) {
-                this._removealtSwitcher();
-                this._createActions();
-                this._createaltStatusSwitcher();
-            }
-            else {
-                this._destroyActions();
-                this._removealtStatusSwitcher();
-                this._addDefaultButton();
-            }
-            
-        }
+    _update: function() {
+        this._removeObjects();
+        this._setActState();
+        this._updateObjects();
     },
     
     _createActions: function() {
         this._altsuspendAction = this.systemMenu._createActionButton('media-playback-pause-symbolic', _("Suspend"));
         this._altsuspendActionID = this._altsuspendAction.connect('clicked', Lang.bind(this, this._onSuspendClicked));
 
-        this._altpowerOffAction = this.systemMenu._createActionButton('system-shutdown-symbolic', _("Power Off"));
-        this._altpowerOffActionId = this._altpowerOffAction.connect('clicked', Lang.bind(this, this._onPowerOffClicked));
+        if (!this._settings.get_boolean(REPLACE_POWEROFF)) {
+            this._altpowerOff_logOffAction = this.systemMenu._createActionButton('system-shutdown-symbolic', _("Power Off"));
+            this._altpowerOff_logOffActionId = this._altpowerOff_logOffAction.connect('clicked', Lang.bind(this, this._onPowerOffClicked));
+	}
+	else {
+            this._altpowerOff_logOffAction = this.systemMenu._createActionButton('logoff-symbolic', _("Log Off"));
+            this._altpowerOff_logOffActionId = this._altpowerOff_logOffAction.connect('clicked', Lang.bind(this, this._onQuitSessionClicked));
+	}
     },
     
     _destroyActions: function() {
@@ -143,9 +108,9 @@ const Extension = new Lang.Class({
             this._altsuspendActionId = 0;
         }
 
-        if (this._altpowerOffActionId) {
-            this._altpowerOffAction.disconnect(this._altpowerOffActionId);
-            this._altpowerOffActionId = 0;
+        if (this._altpowerOff_logOffActionId) {
+            this._altpowerOff_logOffAction.disconnect(this._altpowerOff_logOffActionId);
+            this._altpowerOff_logOffActionId = 0;
         }
         
         if (this._altsuspendAction) {
@@ -153,27 +118,82 @@ const Extension = new Lang.Class({
             this._altsuspendAction = 0;
         }
 
-        if (this._altpowerOffAction) {
-            this._altpowerOffAction.destroy();
-            this._altpowerOffAction = 0;
+        if (this._altpowerOff_logOffAction) {
+            this._altpowerOff_logOffAction.destroy();
+            this._altpowerOff_logOffAction = 0;
         }
     },
     
+    _setActState: function() {
+       if (this._settings.get_boolean(SHOW_TWO_BUTTONS)) this.state = 1; else this.state = 0;
+       if (this._settings.get_boolean(SUSPEND_DEFAULT)) this.state += 2; 
+       if (this._settings.get_boolean(REPLACE_POWEROFF)) this.state += 4; 
+    },
+    
+    _removeObjects: function() {
+        switch (this.state) {
+        case 0:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT false, REPLACE_POWEROFF false
+            this._removealtSwitcher();
+            break;
+        case 1:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT false, REPLACE_POWEROFF false
+        case 3:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT true, REPLACE_POWEROFF false
+        case 5:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT false, REPLACE_POWEROFF true
+        case 7:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT true, REPLACE_POWEROFF true
+            this._destroyActions();
+            break;
+        case 2:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT true, REPLACE_POWEROFF false
+        case 4:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT false, REPLACE_POWEROFF true
+        case 6:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT true, REPLACE_POWEROFF true
+            this._removealtStatusSwitcher();
+            break;
+        default:
+            log('Unknown OldState'+ this.state);
+            break;
+        }
+    },
+
+    _updateObjects: function() {
+        switch (this.state) {
+        case 0:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT false, REPLACE_POWEROFF false
+            this._addDefaultButton();
+            break;
+        case 1:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT false, REPLACE_POWEROFF false
+        case 3:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT true, REPLACE_POWEROFF false
+        case 5:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT false, REPLACE_POWEROFF true
+        case 7:                              // SHOW_TWO_BUTTONS true, SUSPEND_DEFAULT true, REPLACE_POWEROFF true
+            this._createActions();
+            this._addSingleButtons();
+            break;
+        case 2:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT true, REPLACE_POWEROFF false
+        case 6:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT true, REPLACE_POWEROFF true
+            this._createActions();
+            this._createaltStatusSwitcher(this._altsuspendAction,this._altpowerOff_logOffAction);
+            break;
+        case 4:                              // SHOW_TWO_BUTTONS false, SUSPEND_DEFAULT false, REPLACE_POWEROFF true
+            this._createActions();
+            this._createaltStatusSwitcher(this._altpowerOff_logOffAction,this._altsuspendAction);
+            break;
+       default:
+            log('Unknown State '+ this.state);
+            break;
+        }
+    },
+
     _addDefaultButton: function() {
         this.systemMenu._actionsItem.actor.add(this.systemMenu._altSwitcher.actor, { expand: true, x_fill: false });
     },
     
     _addSingleButtons: function() {
         this.systemMenu._actionsItem.actor.add(this._altsuspendAction, { expand: true, x_fill: false });
-        this.systemMenu._actionsItem.actor.add(this._altpowerOffAction, { expand: true, x_fill: false });
+        this.systemMenu._actionsItem.actor.add(this._altpowerOff_logOffAction, { expand: true, x_fill: false });
     },
     
     _removealtSwitcher: function() {
         this.systemMenu._actionsItem.actor.remove_child(this.systemMenu._altSwitcher.actor);
     },
     
-    _createaltStatusSwitcher: function() {
-        this._altStatusSwitcher = new StatusSystem.AltSwitcher(this._altsuspendAction,this._altpowerOffAction);
+    _createaltStatusSwitcher: function(altsuspendAction,altpowerOffAction) {
+        this._altStatusSwitcher = new StatusSystem.AltSwitcher(altsuspendAction,altpowerOffAction);
         this.systemMenu._actionsItem.actor.add(this._altStatusSwitcher.actor, { expand: true, x_fill: false });
     },
     
@@ -191,6 +211,11 @@ const Extension = new Lang.Class({
 
     _onSuspendClicked: function() {
         this.systemMenu._onSuspendClicked();
+    },
+
+    _onQuitSessionClicked: function() {
+        this.systemMenu.menu.itemActivated();
+        this.systemMenu._onQuitSessionActivate();
     }
 });
 
@@ -198,4 +223,3 @@ function init(metadata) {
     Lib.initTranslations(Me);
     return new Extension();
 }
-

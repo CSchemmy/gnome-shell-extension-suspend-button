@@ -13,5 +13,10 @@
         Press alt to shutdown.
         This setting has no effect if two buttons are shown.</description>
     </key>
+    <key type="b" name="replace-poweroff">
+        <default>false</default>
+        <summary>Change poweroff to logoff</summary>
+        <description>Change power-off-button by log-off-button</description>
+    </key>
   </schema>
 </schemalist>
