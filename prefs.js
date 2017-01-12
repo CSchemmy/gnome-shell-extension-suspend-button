@@ -47,3 +47,4 @@ function _createCheckBox(key, text, tooltip) {
     box.add(widget);
     return box;
 }
+
