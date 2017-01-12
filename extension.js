@@ -1,4 +1,4 @@
-﻿﻿/*  Copyright (C) 2014 Raphael Freudiger <laser_b@gmx.ch>
+﻿/*  Copyright (C) 2014 Raphael Freudiger <laser_b@gmx.ch>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -223,3 +223,4 @@ function init(metadata) {
     Lib.initTranslations(Me);
     return new Extension();
 }
+
